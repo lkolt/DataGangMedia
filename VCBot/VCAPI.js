@@ -83,15 +83,28 @@ class OsnovaAPI {
             'title': title,
             'text': text,
             'subsite_id': subsite_id
+            // 'attachments': attachments
         }
 
         return this.post_request('entry/create', form)
+    }
+
+    async create_comment (entry_id, text, reply_to, attachments) { // reply_to === 0 if doesnt need
+        let form = {
+            'id': entry_id,
+            'text': text,
+            'reply_to': reply_to
+            // 'attachments': attachments
+        }
+
+        return this.post_request('comment/add', form)
     }
 }
 
 let init = async () => {
     let api = new OsnovaAPI()
-    console.log(await api.create_entry('You', 'This post created automaticly!'))
+    // console.log(await api.create_comment('You', 'This post created automaticly!'))
+    console.log(await api.create_comment(85072, 'This comment created automaticly!', 0, []))
 }
 
 init()
