@@ -24,7 +24,7 @@ class Summarizer:
     def get_summary(text: str):
         sents = sent_tokenize(text)
         sents_storage = deepcopy(sents)
-        n_sents = round(np.sqrt(len(sents_storage)))
+        n_sents = int(round(np.sqrt(len(sents_storage))))
 
         for i in range(len(sents)):
             sents[i] = preprocessing_rus(sents[i])
