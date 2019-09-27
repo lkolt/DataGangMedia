@@ -5,6 +5,7 @@ const axios = require('axios')
 const FormData = require('form-data');
 
 const max_attempts = 0
+const subsite_id = 369096
 
 class OsnovaAPI {
     constructor (main_url) {
@@ -28,16 +29,21 @@ class OsnovaAPI {
             })
             .then((response) => {
                 this.attempts = 0
-                resolve(response.data)
+                resolve({
+                    err: null,
+                    data: response.data
+                })
             })
             .catch((error) => {
-                console.log('Cant get path:', path, 'Recieve: ', error)
+                console.log('Cant get path:', path, 'Recieve: ', JSON.stringify(error))
                 console.log('Attempts:', this.attempts)
                 if (this.attempts < max_attempts) {
                     this.attempts++
                     console.log('Try to reget login')
                     this.token = this.get_token()
                     this.get_request(path, args)
+                } else {
+                    reject({ err: error.code })
                 }
             })
         })
@@ -52,7 +58,7 @@ class OsnovaAPI {
 
         let res = await new Promise (async (resolve, reject) => {
             axios({ method: 'POST', 
-                    url: url_vc + path, 
+                    url: this.main_url + path, 
                     headers: {
                         'X-Device-Token': await this.token,
                         'content-type': `multipart/form-data; boundary=${form._boundary}`
@@ -61,23 +67,28 @@ class OsnovaAPI {
             })
             .then((response) => {
                 this.attempts = 0
-                resolve(response.data)
+                resolve({
+                    err: null,
+                    data: response.data
+                })
             })
             .catch((error) => {
-                console.log('Cant get path:', path, 'Recieve: ', error)
+                console.log('Cant get path:', path, 'Recieve: ', JSON.stringify(error))
                 console.log('Attempts:', this.attempts)
                 if (this.attempts < max_attempts) {
                     this.attempts++
                     console.log('Try to reget login')
                     this.token = this.get_token()
                     this.get_request(path, args)
+                } else {
+                    reject({ err: error.code })
                 }
             })
         })
         return await res
     }
 
-    async create_entry (title, text, subsite_id, attachments) {
+    async create_entry (title, text, attachments) {
         let form = {
             'title': title,
             'text': text,
@@ -100,6 +111,6 @@ class OsnovaAPI {
     }
 }
 
-module.exports.get_api = (main_url) => {
+module.exports.get = (main_url) => {
     return new OsnovaAPI(main_url)
 }
