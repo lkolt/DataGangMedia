@@ -4,13 +4,12 @@ const fs = require('fs')
 const axios = require('axios')
 const FormData = require('form-data');
 
-const url_vc = 'https://api.vc.ru/v1.8/'
 const max_attempts = 0
-const subsite_id = 369096
 
 class OsnovaAPI {
-    constructor () {
+    constructor (main_url) {
         this.token = this.get_token()
+        this.main_url = main_url
         this.attempts = 0
     }
 
@@ -24,7 +23,7 @@ class OsnovaAPI {
 
     async get_request (path, args) { // TODO: add args
         let res = await new Promise (async (resolve, reject) => {
-            axios.get(url_vc + path, { 
+            axios.get(this.main_url + path, { 
                 headers: { 'X-Device-Token': await this.token }
             })
             .then((response) => {
@@ -78,7 +77,7 @@ class OsnovaAPI {
         return await res
     }
 
-    async create_entry (title, text, attachments) {
+    async create_entry (title, text, subsite_id, attachments) {
         let form = {
             'title': title,
             'text': text,
@@ -101,11 +100,6 @@ class OsnovaAPI {
     }
 }
 
-let init = async () => {
-    let api = new OsnovaAPI()
-    // console.log(await api.create_comment('You', 'This post created automaticly!'))
-    console.log(await api.create_comment(85072, 'This comment created automaticly!', 0, []))
+module.exports.get_api = (main_url) => {
+    return new OsnovaAPI(main_url)
 }
-
-init()
-
