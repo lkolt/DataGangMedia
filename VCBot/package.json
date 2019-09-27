@@ -15,6 +15,10 @@
     "express": "^4.17.1",
     "form-data": "^2.5.1",
     "fs": "0.0.1-security",
-    "querystring": "^0.2.0"
+    "medium-sdk": "0.0.4",
+    "querystring": "^0.2.0",
+    "reconnecting-websocket": "^4.2.0",
+    "sleep": "^6.1.0",
+    "ws": "^7.1.2"
   }
 }
