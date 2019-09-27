@@ -2,7 +2,7 @@
 
 const fs = require('fs')
 const axios = require('axios')
-const querystring = require('querystring');
+const FormData = require('form-data');
 
 const url_vc = 'https://api.vc.ru/v1.8/'
 const max_attempts = 0
@@ -25,7 +25,7 @@ class OsnovaAPI {
     async get_request (path, args) { // TODO: add args
         let res = await new Promise (async (resolve, reject) => {
             axios.get(url_vc + path, { 
-                headers: {'X-Device-Token': await this.token }
+                headers: { 'X-Device-Token': await this.token }
             })
             .then((response) => {
                 this.attempts = 0
@@ -46,14 +46,19 @@ class OsnovaAPI {
     }
 
     async post_request (path, args) { // TODO: add args
+        const form = new FormData()
+        for ( const key in args ) {
+            form.append(key, args[key])
+        }
+
         let res = await new Promise (async (resolve, reject) => {
             axios({ method: 'POST', 
                     url: url_vc + path, 
                     headers: {
                         'X-Device-Token': await this.token,
-                        'Content-Type': 'multipart/form-data'
+                        'content-type': `multipart/form-data; boundary=${form._boundary}`
                     }, 
-                    data: args
+                    data: form
             })
             .then((response) => {
                 this.attempts = 0
@@ -77,17 +82,17 @@ class OsnovaAPI {
         let form = {
             'title': title,
             'text': text,
-            'subsite_id': subsite_id,
-            'attachments': []
+            'subsite_id': subsite_id
         }
 
-        return this.post_request('entry/create', querystring.stringify(form))
+        return this.post_request('entry/create', form)
     }
 }
 
 let init = async () => {
     let api = new OsnovaAPI()
-    console.log(await api.create_entry('You', 'Hi from node.js'))
+    console.log(await api.create_entry('You', 'This post created automaticly!'))
 }
 
 init()
+
