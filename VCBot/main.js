@@ -13,7 +13,10 @@ class bot {
         this.wrapper = ml_wrapper.get()
     }
 
-    run () {
+    async run () {
+        const vk_posts = await this.sources.get_vk_posts();
+        
+        console.log('test', vk_posts);
         let posts = this.sources.get_posts()
         let formatted_posts = this.wrapper.proccess(posts)
         for (let post of formatted_posts) {
