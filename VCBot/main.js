@@ -57,7 +57,8 @@ class bot {
             let formatted_posts = await this.wrapper.proccess(new_posts)
             console.log('Formatted posts:', formatted_posts)
             for (let post of formatted_posts) {
-                let res = this.api.create_entry(post.title, post.text)
+                let res = this.api.create_entry(post.title, post.text 
+                        + '\nСозднано автоматически на основе: ' + post.url)
                 if (res.err) {
                     console.log('Cant create post!:', res.err)
                 } else {
