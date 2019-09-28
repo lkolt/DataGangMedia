@@ -109,15 +109,23 @@ class OsnovaAPI {
         return await res
     }
 
-    async create_entry (title, text, attachments) {
+    async create_entry (title, text, url) {
         let form = {
             'title': title,
             'text': text,
-            'subsite_id': subsite_id
-            // 'attachments': attachments
+            'subsite_id': subsite_id,
+        }
+        let attachments = []
+
+        if (url) {
+            const url_data = await this.post_request('uploader/extract', url)
+            
+            if (url_data.data) {
+                attachments = [ ...attachments, ...url_data.data.result ]
+            }  
         }
 
-        return this.post_request('entry/create', form)
+        return this.post_request('entry/create', { ...form, attachments })
     }
 
     async create_comment (entry_id, text, reply_to, attachments) { // reply_to === 0 if doesnt need
