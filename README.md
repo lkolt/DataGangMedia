@@ -1,5 +1,7 @@
 # DataGangMedia
 
+Summurazer bot for VC.ru!
+
 ## Requirements
 
 Node.js > v10.15.1
