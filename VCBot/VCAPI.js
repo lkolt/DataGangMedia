@@ -109,21 +109,21 @@ class OsnovaAPI {
         return await res
     }
 
-    async create_entry (title, text, url) {
+    async create_entry (title, text, image) {
         let form = {
             'title': title,
             'text': text,
             'subsite_id': subsite_id,
         }
         let attachments = []
-
-        /*if (url) {
-            const url_data = await this.post_request('uploader/extract', url)
+        
+        if (image) {
+            const image_data = await this.post_request('uploader/extract', { url: image })
             
-            if (url_data.data) {
-                attachments = [ ...attachments, ...url_data.data.result ]
-            }  
-        }*/
+            if (image_data.data) {
+                attachments = [ ...attachments, ...image_data.data.result ]
+            } 
+        }
 
         return this.post_request('entry/create', { ...form, attachments: JSON.stringify(attachments) })
     }
