@@ -16,11 +16,13 @@ class bot {
         this.idx = 0
         this.get_already_posted = this.get_already_posted()
         this.get_posts()
-        // setInterval(this.get_posts.bind(this), 1000 * 60 * 30)
-        setInterval(this.run.bind(this), 1000 * 60 * 3)
+        setInterval(this.get_posts.bind(this), 1000 * 60 * 60)
+        setInterval(this.run.bind(this), 1000 * 60 * 10)
     }
 
     async get_posts () {
+        console.log('Getting posts!')
+        this.idx = 0
         this.posts = this.sources.get_posts()
     }
     
