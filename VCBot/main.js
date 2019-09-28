@@ -101,7 +101,7 @@ class bot {
                                     ? `\nСоздано автоматически на основе: <a href="${post.url}" target="_blank">${post.url}</a>`
                                     : '')
                             ),
-                            post.image,
+                            post.images,
                         )
                         if (res.err) {
                             console.log('Cant create post!:', res.err)
