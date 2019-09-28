@@ -13,12 +13,16 @@ Python > 3.7.2
 ## Build
 
 ### Build ML
-Download model from google drive:
-[model](https://drive.google.com/open?id=1Uyl6JQrH4oekeoJBKUvPCIFvuKX0WIsw)
+Download models from google drive:
+[model1](https://drive.google.com/open?id=1Uyl6JQrH4oekeoJBKUvPCIFvuKX0WIsw)
+and
+[model2](https://drive.google.com/open?id=1FwnWY6fPeRgpUEllvuK7tj-F2U_STNd_)
 
 And move it into ```/models/```:
 
 ``` mv run.bin models/```
+
+``` mv classification_pipeline.pkl models/```
 
 install requirements:
 
