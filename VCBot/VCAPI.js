@@ -88,7 +88,7 @@ class OsnovaAPI {
             })
             .then((response) => {
                 this.attempts = 0
-                resolve({
+                return resolve({
                     err: null,
                     data: response.data
                 })
@@ -100,9 +100,9 @@ class OsnovaAPI {
                     this.attempts++
                     console.log('Try to reget login')
                     this.token = this.get_token()
-                    this.get_request(path, args)
+                    return this.post_request(path, args)
                 } else {
-                    reject({ err: error.code })
+                    return reject({ err: error.code })
                 }
             })
         })
