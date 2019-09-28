@@ -29,9 +29,19 @@ class OsnovaAPI {
             sleep(1000)
         }
         this.last_request = Date.now()
+
+        const form = new FormData()
+        for ( const key in args ) {
+            form.append(key, args[key])
+        }
+
         let res = await new Promise (async (resolve, reject) => {
-            axios.get(this.main_url + path, { 
-                headers: { 'X-Device-Token': await this.token }
+            axios({ method: 'GET', 
+                    url: this.main_url + path, 
+                    headers: {
+                        'X-Device-Token': await this.token
+                    },
+                    data: args
             })
             .then((response) => {
                 this.attempts = 0
