@@ -13,9 +13,11 @@ class bot {
         this.wrapper = ml_wrapper.get()
     }
 
-    run () {
-        let posts = this.sources.get_posts()
-        let formatted_posts = this.wrapper.proccess(posts)
+    async run () {
+        let posts = await this.sources.get_posts()
+        let formatted_posts = await this.wrapper.proccess(posts)
+        console.log('Formatted posts:', formatted_posts)
+        return
         for (let post of formatted_posts) {
             let res = this.api.create_entry(post.title, post.text)
             if (res.err) {

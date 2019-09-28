@@ -7,7 +7,7 @@ const FormData = require('form-data');
 const max_attempts = 0
 const subsite_id = 369096
 
-class OsnovaAPI {
+class OsnovaAPI { // TODO: add 1 request per sec
     constructor (main_url) {
         this.token = this.get_token()
         this.main_url = main_url

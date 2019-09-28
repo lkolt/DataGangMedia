@@ -1,59 +1,66 @@
 'use strict'
 
-const ReconnectingWebSocket = require('reconnecting-websocket')
-const sleep = require('sleep')
+const WebSocket = require('ws')
 
-const ml_url = 'localhost:8080'
+const ml_url = 'ws://localhost:8000'
 
 class wrapper {
     constructor () {
         this.id = 0
         this.answers = []
         this.posts = []
-        this.ws = new ReconnectingWebSocket(ml_url) 
-        this.ws.addEventListener('open', () => {
-            console.log('Connection to wrapper open!')
-        })
-        this.ws.addEventListener('message', (msg) => {
-           this.answers[msg.data.id] = msg.data.text
-        })
+        this.queue = []
+        this.resolvers = []
+        this.init()
     }
 
-    check_recieve (min_id) {
-        let idx = this.id - 1
-        while (idx >= min_id) {
-            if (!this.answers[id]) {
-                return false
-            }
-        }
-        return true
-    }
-
-    proccess (posts) {
-        start_id = this.id
-        for (let post of posts) {
-            this.posts[this.id] = post
-            this.ws.send({
-                id: this.id++,
-                text: post.text
+    async init () {
+        this.ready = new Promise((resolve, reject) => {
+            this.ws = new WebSocket(ml_url)
+            console.log('Setting up ws')
+            this.ws.on('open', () => {
+                console.log('Connection to wrapper open!')
+                resolve(true)
             })
-        }
+            this.ws.on('message', (data) => {
+                let msg = JSON.parse(data)
+                let id = msg.id
+                this.answers[id] = this.resolvers[id](msg.text)
+            })
+        })
+    }
 
-        while (!this.check_recieve(min_id)) {
-            sleep.sleep(1) // 1 sec
-        }
+    async proccess (posts) {
+        console.log('proccessing posts:', posts, '...')
+        let ready = await this.ready
+        if (ready) {
+            let start_id = this.id
+            for (let post of posts) {
+                this.posts[this.id] = post
+                let msg = {
+                    id: this.id,
+                    text: post.text
+                }
+                this.answers[this.id] = new Promise ((resolve, reject) => {
+                    this.resolvers[this.id] = resolve
+                })
+                this.id++
+                this.ws.send(JSON.stringify(msg))
+            }
 
-        let res = []
-        for (let i = start_id; i < this.id; i++) {
-            let post = this.posts[i]
-            post.text = this.answers[i]
-            res.push(post)
+            let res = []
+            for (let i = start_id; i < this.id; i++) {
+                let post = this.posts[i]
+                post.text = await this.answers[i]
+                res.push(post)
+            }
+            return res
         }
-
-        return res
+        return []
     }
 }
 
 module.exports.get = () => {
     return new wrapper()
 }
+
