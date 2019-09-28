@@ -30,7 +30,8 @@ class Summarizer:
         print('init model:', text)
 
         sents = [sent.split('.') for sent in sent_tokenize(text)]
-        sents = [item for sublist in sents for item in sublist if len(item)]
+        sents = [item for sublist in sents for item in sublist if len(item) >= 30 \
+                                                    and '?' not in item]
         sents_storage = deepcopy(sents)
         n_sents = int(round(np.sqrt(len(sents_storage))))
 
