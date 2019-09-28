@@ -16,7 +16,7 @@ class wrapper {
 
     async init () {
         this.ready = new Promise((resolve, reject) => {
-            this.ws = new WebSocket(ml_url)
+            //this.ws = new WebSocket(ml_url)
             console.log('Setting up ws')
             this.ws.on('open', () => {
                 console.log('Connection to wrapper open!')

@@ -12,7 +12,7 @@ class vk {
         this.posts_count = 5
         this.comments_count = 2
 
-        this.communities = [ 'rbc', 'deep_space', 'space_live', 'ria' ]
+        this.communities = [ 'rbc', 'ria', 'space_live', 'deep_space' ]
     }
 
     async init() {
@@ -39,10 +39,16 @@ class vk {
         })
     }
 
-    map_post(community, post, content, comment, image) {
+    map_post(community, post, content, comment, images) {
         return ({
             url: this.get_post_url(community, post.owner_id, post.id),
-            image: image || content && content.image || null,
+            images: images.length
+                ? images
+                : (
+                    (content && content.image)
+                        ? [ content.image ]
+                        : []
+                ),
             owner_id: post.owner_id,
             id: post.id,
             title: content && content.title || post.text,
@@ -231,31 +237,35 @@ class vk {
         const images = await Promise.all(
             posts.map(
                 async (post) => {
-                    const image = (
+                    const images = (
                         post.attachments &&
-                        post.attachments.find((attachment) => attachment.type === 'photo')
+                        post.attachments.filter((attachment) => attachment.type === 'photo')
                     )
                     
-                    if (image) {
-                        const photo = await this.vk.api.photos.getById({
-                            photos: [ post.owner_id, image.photo.id, image.photo.access_key ].reduce(
+                    if (images && images.length) {
+                        const photos = await this.vk.api.photos.getById({
+                            photos: images.map((image) => (
+                                [ post.owner_id, image.photo.id, image.photo.access_key ].reduce(
                                     (paths, path) => [
                                         ...paths,
                                         ...!!path ? [ path ] : [],
                                     ],
                                     [],
-                                ).join('_'),
+                                ).join('_')
+                            )).join(','),
                             extended: 0,
                         })    
                     
-                        if (photo[0]) {
-                            const url = photo[0].sizes.find((size) => size.type === 'x').url
+                        if (photos.length) {
+                            const urls = photos.map(
+                                (photo) => photo.sizes.find((size) => size.type === 'x').url,
+                            )
                             
-                            return url
+                            return urls
                         }
                     }
 
-                    return ''
+                    return []
                 },
             )
         )

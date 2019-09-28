@@ -109,7 +109,7 @@ class OsnovaAPI {
         return await res
     }
 
-    async create_entry (title, text, image) {
+    async create_entry (title, text, images) {
         let form = {
             'title': title,
             'text': text,
@@ -117,11 +117,21 @@ class OsnovaAPI {
         }
         let attachments = []
         
-        if (!!image) {
-            const image_data = await this.post_request('uploader/extract', { url: image })
-            
-            if (image_data.data) {
-                attachments = [ ...attachments, ...image_data.data.result ]
+        if (!!images.length) {
+            const images_data = await Promise.all(
+                images.map(async (image) => await this.post_request('uploader/extract', { url: image }))
+            )
+
+            if (images_data.length) {
+                const images_attach = images_data.reduce(
+                    (images, image) => [
+                        ...images,
+                        ...image.data ? image.data.result : [],
+                    ],
+                    [],
+                )
+                
+                attachments = [ ...attachments, ...images_attach ]
             } 
         }
 
