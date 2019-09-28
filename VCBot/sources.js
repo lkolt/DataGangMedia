@@ -1,6 +1,8 @@
 'use strict'
 
 const vk = require('./apis/vk')
+const emojiRegex = require('emoji-regex')
+const regex = emojiRegex()
 
 const awesome_titles = ['Прекрасное краткое содержание!', 'Это важно!', 'Look at me', 'Дайджест',
                         'Новый пост', 'Важные новости']
@@ -10,6 +12,18 @@ let get_random_title = () => {
     return awesome_titles[idx]
 }
 
+const stop_words = ['получи', 'пройди', 'пройдите', 'попробуй', 'выбирай', 'оставь', 'регистрируйся']
+
+let check_stop_words = (text) => {
+    for (let stop_word of stop_words) {
+        if (text.includes(stop_word)) {
+            return true
+        }
+    }
+
+    return false
+}
+
 class sources {
     constructor() {
         this.vk = vk.get();
@@ -17,8 +31,15 @@ class sources {
 
     async get_posts () {
         let vk_posts = await this.vk.get_posts() 
-        console.log(vk_posts)
-        let approved_posts = vk_posts.filter((item) => { return item.text.length  > 500 })
+        console.log('Get vk posts:', vk_posts.length)
+
+        let approved_posts = vk_posts.filter((item) => { 
+            let preproc = item.text.replace(' ', '').toLocaleLowerCase()
+            return  preproc.length  > 500 && 
+                    !check_stop_words(preproc) &&
+                    !regex.exec(preproc)
+        })
+        console.log('Get approved posts:', approved_posts.length)
         approved_posts = approved_posts.map((item) => { 
             if (item.title === item.text) {
                 item.title = get_random_title()
