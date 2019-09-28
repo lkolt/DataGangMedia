@@ -252,10 +252,6 @@ class vk {
     get_post_url (community, owner_id, post_id) {
         return `https://vk.com/${community}?w=wall${owner_id}_${post_id}`
     }
-
-    get_post_image (owner_id, media_id) {
-
-    }
 }
 
 module.exports.get = () => {
