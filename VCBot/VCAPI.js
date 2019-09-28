@@ -19,7 +19,7 @@ class OsnovaAPI {
     async get_token () {
         return new Promise((resolve, reject) => {
             fs.readFile('token', 'utf8', (err, data) => {
-                resolve(data)
+                resolve(data.replace(' ', '').replace('\n', ''))
             })
         })
     }
