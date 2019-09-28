@@ -2,13 +2,15 @@
 
 const fs = require('fs')
 const axios = require('axios')
-const FormData = require('form-data');
+const FormData = require('form-data')
+const sleep = require('system-sleep')
 
 const max_attempts = 0
 const subsite_id = 369096
 
-class OsnovaAPI { // TODO: add 1 request per sec
+class OsnovaAPI {
     constructor (main_url) {
+        this.last_request = 0
         this.token = this.get_token()
         this.main_url = main_url
         this.attempts = 0
@@ -22,7 +24,11 @@ class OsnovaAPI { // TODO: add 1 request per sec
         })
     }
 
-    async get_request (path, args) { // TODO: add args
+    async get_request (path, args) {
+        if (Date.now - this.last_request < 1000) {
+            sleep(1000)
+        }
+        this.last_request = Date.now()
         let res = await new Promise (async (resolve, reject) => {
             axios.get(this.main_url + path, { 
                 headers: { 'X-Device-Token': await this.token }
@@ -50,7 +56,12 @@ class OsnovaAPI { // TODO: add 1 request per sec
         return await res
     }
 
-    async post_request (path, args) { // TODO: add args
+    async post_request (path, args) {
+        if (Date.now - this.last_request < 1000) {
+            sleep(1000)
+        }
+        this.last_request = Date.now()
+
         const form = new FormData()
         for ( const key in args ) {
             form.append(key, args[key])
