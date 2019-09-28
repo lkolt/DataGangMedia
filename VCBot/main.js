@@ -7,6 +7,7 @@ const sources = require('./sources')
 const ml_wrapper = require('./ml_wrapper')
 
 const url_vc = 'https://api.vc.ru/v1.8/'
+const min_posts_for_dijest = 3
 
 class bot {
     constructor () {
@@ -14,11 +15,12 @@ class bot {
         this.sources = sources.get()
         this.wrapper = ml_wrapper.get()
         this.new_hashes = []
+        this.dijest = []
         this.idx = 0
         this.get_posted = this.get_already_posted()
         this.get_posts()
         setInterval(this.get_posts.bind(this), 1000 * 60 * 30)
-        setInterval(this.run.bind(this), 1000 * 60 * 10)
+        setInterval(this.run.bind(this), 1000 * 60 * 5)
     }
 
     async get_posts () {
@@ -62,8 +64,34 @@ class bot {
             let formatted_posts = await this.wrapper.proccess(new_posts)
             console.log('Formatted posts:', formatted_posts.length)
             for (let post of formatted_posts) {
-                console.log(post.class)
-                // return
+                if (post.class != 'Оффтоп') {
+                    if (!this.dijest[post.class]) {
+                        this.dijest[post.class] = []
+                    }
+                    this.dijest[post.class].push({
+                        text: post.text, 
+                        url: post.url
+                    })
+                    if (this.dijest[post.class].length >= min_posts_for_dijest) {
+                        let title = 'Дайджест по теме ' + post.class + ' за последние пару часов!'
+                        let text = 'Наш автодайжест уже с вами! Сортируем темы по актуальности специально для вас.\n'
+                        let idx = 0
+                        for (let item of this.dijest[post.class]) {
+                            idx++
+                            text += idx + ') ' + item.text + '\n'
+                            text += `Полная статья: <a href="${item.url}" target="_blank">${item.url}</a>\n\n`
+                        }
+                        let res = this.api.create_entry(title, text)
+                        
+                        if (res.err) {
+                            console.log('Cant create post!:', res.err)
+                        } else {
+                            console.log('Dijest', 'created')
+                        }
+                        this.dijest[post.class] = []
+                    }
+                }
+
                 let res = this.api.create_entry(
                     post.title,
                     (

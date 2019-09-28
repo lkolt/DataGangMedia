@@ -25,7 +25,7 @@ class wrapper {
             this.ws.on('message', (data) => {
                 let msg = JSON.parse(data)
                 let id = msg.id
-                this.answers[id] = this.resolvers[id](msg.text)
+                this.answers[id] = this.resolvers[id]([msg.text, msg.class])
             })
         })
     }
@@ -51,7 +51,9 @@ class wrapper {
             let res = []
             for (let i = start_id; i < this.id; i++) {
                 let post = this.posts[i]
-                post.text = await this.answers[i]
+                let ans = await this.answers[i]
+                post.text = ans[0]
+                post.class = ans[1]
                 res.push(post)
             }
             return res
