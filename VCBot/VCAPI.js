@@ -125,7 +125,7 @@ class OsnovaAPI {
             }  
         }
 
-        return this.post_request('entry/create', { ...form, attachments })
+        return this.post_request('entry/create', { ...form, attachments: JSON.stringify(attachments) })
     }
 
     async create_comment (entry_id, text, reply_to, attachments) { // reply_to === 0 if doesnt need
