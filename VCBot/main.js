@@ -14,8 +14,9 @@ class bot {
         this.sources = sources.get()
         this.wrapper = ml_wrapper.get()
         this.idx = 0
-        this.get_posts()
         this.get_already_posted = this.get_already_posted()
+        this.get_posts()
+        // setInterval(this.get_posts.bind(this), 1000 * 60 * 30)
         setInterval(this.run.bind(this), 1000 * 60 * 3)
     }
 
@@ -38,7 +39,7 @@ class bot {
         return []
     }
 
-    async get_already_posted () {
+    async get_already_posted () { // TODO: get from VC.ru
         return new Promise((resolve, reject) => {
             fs.readFile('posted.db', 'utf8', (err, data) => {
                 resolve(data.split('\n'))
@@ -47,7 +48,7 @@ class bot {
     }
 
     new_post (md5) {
-        fs.appendFile('posted.db', md5, () => {})
+        fs.appendFile('posted.db', md5 + '\n', () => {})
     }
 
     async run () {
