@@ -31,7 +31,7 @@ class wrapper {
     }
 
     async proccess (posts) {
-        console.log('proccessing posts:', posts, '...')
+        console.log('proccessing posts:', posts.length, '...')
         let ready = await this.ready
         if (ready) {
             let start_id = this.id
