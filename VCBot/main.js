@@ -60,9 +60,12 @@ class bot {
             console.log('Formatted posts:', formatted_posts)
             for (let post of formatted_posts) {
                 let res = this.api.create_entry(
+                    post.title,
                     (
-                        post.title, post.text +
-                        '\nСозднано автоматически на основе: ' + post.url
+                        post.text +
+                        (post.url
+                            ? `\nСоздано автоматически на основе: <a href="${post.url}" target="_blank">${post.url}</a>`
+                            : '')
                     ),
                     post.url,
                 )
