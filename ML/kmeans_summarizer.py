@@ -1,14 +1,14 @@
-import numpy as np
 from copy import deepcopy
+import numpy as np
 
-from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
+from sklearn.cluster import KMeans
 
-from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.corpus import stopwords
 
-import gensim
 import pymorphy2
+import gensim
 import pickle
 import json
 import os
@@ -88,4 +88,3 @@ class Classifier:
     def get_class(self, text):
         text = self.preprocessing_rus(text)
         return self.clf_pipe.predict([text])[0]
-
