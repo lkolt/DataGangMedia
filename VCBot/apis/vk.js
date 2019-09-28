@@ -8,8 +8,8 @@ const axios = require('axios')
 class vk {
     constructor() {
         this.ready = this.init()
-        this.posts_count = 20
-        this.comments_count = 10
+        this.posts_count = 3
+        this.comments_count = 2
         this.communities = [ 'rbc', 'bizness_online', 'reklamamarketing' ]
     }
 
@@ -22,7 +22,7 @@ class vk {
     async get_token () {
         return new Promise((resolve, reject) => {
             fs.readFile('apis/vk.config', 'utf8', (err, data) => {
-                resolve(data)
+                resolve(data.replace(' ', '').replace('\n', ''))
             })
         })
     }
@@ -79,11 +79,13 @@ class vk {
     }
 
     async get_posts () {
+        console.log('Entry to get posts')
         const communities = await Promise.all(
             this.communities.map(async (community) => (
                 await this.get_community_posts(community)),
             ),
         )
+        console.log(communities)
         
         return communities.reduce(
             (communities, community) => [
