@@ -12,7 +12,7 @@ class vk {
         this.posts_count = 5
         this.comments_count = 2
 
-        this.communities = [ 'rbc', 'deep_space', 'space_live' ]
+        this.communities = [ 'rbc', 'deep_space', 'space_live', 'ria' ]
     }
 
     async init() {
@@ -84,25 +84,56 @@ class vk {
 
     async get_posts () {
         console.log('Entry to get posts')
-        const communities = await Promise.all(
-            this.communities.map(async (community) => (
-                await this.get_community_posts(community)),
-            ),
-        )
-        
-        return communities.reduce(
-            (communities, community) => [
-                ...communities,
-                ...community,
-            ],
-            [],
-        )
+        try {
+            const communities = await Promise.all(
+                this.communities.map(async (community) => (
+                    await this.get_community_posts(community)),
+                ),
+            )
+            
+            return communities.reduce(
+                (communities, community) => [
+                    ...communities,
+                    ...community,
+                ],
+                [],
+            )
+        } catch (err) {
+            console.error(err)
+
+            return []
+        }
     }
 
     async get_community_posts (community) {
         switch (community) {
             case 'rbc': {
-                return await this.get_rbc_posts(community)
+                return await this.get_site_posts(
+                    community,
+                    {
+                        title: '.l-col-main:first-child .js-slide-title',
+                        image: {
+                            selector: '.l-col-main:first-child .article__main-image img',
+                            attr: 'src',
+                        },
+                        annotation: '.l-col-main:first-child .article__text__overview span',
+                        description: '.l-col-main:first-child p',
+                    },
+                )
+            }
+            case 'ria': {
+                return await this.get_site_posts(
+                    community,
+                    {
+                        title: '.layout-article__main:first-child .article__title:first-child',
+                        image: {
+                            selector: '[property="og:image"]',
+                            attr: 'content',
+                        },
+                        annotation: false,
+                        description: '.layout-article__main:first-child .article__body .article__text',
+                    },
+                )
             }
             default: {
                 return await this._get_posts(community)
@@ -110,9 +141,9 @@ class vk {
         }
     }
 
-    async get_rbc_posts (community) {
+    async get_site_posts (community, selectors) {
         const posts = await this.fetch_posts(community)
-        const posts_contents = await this.get_rbc_posts_contents(posts)
+        const posts_contents = await this.get_posts_contents(posts, selectors)
         const posts_comments = await this.get_posts_comments(posts)
         const posts_images = await this.get_posts_images(posts)
         
@@ -130,12 +161,12 @@ class vk {
             ))
     }
 
-    async get_rbc_post_content (url) {
+    async get_post_content (url, selectors) {
         const post = await axios(url).then(
             (response) => {
                 const $ = cheerio.load(response.data)
 
-                return this.prepare_rbc_post_content($)
+                return this.prepare_post_content($, selectors)
             },
             (err) => {
                 console.error(err)
@@ -147,26 +178,26 @@ class vk {
         return post
     }
 
-    prepare_rbc_post_content ($) {
-        return ({
-            title: this.get_post_title($),
-            text: this.get_post_text($),
-            image: this.get_post_image($),
-        })
+    prepare_post_content ($, { title, image, annotation, description }) {
+        return {
+            title: this.get_post_title($, title),
+            text: this.get_post_text($, { title, annotation, description }),
+            image: this.get_post_image($, image),
+        }
     }
 
-    get_post_title ($) {
-        return $('.l-col-main:first-child .js-slide-title').text()
+    get_post_title ($, title) {
+        return $(title).text()
     }
 
-    get_post_image ($) {
-        return $('.l-col-main:first-child .article__main-image img:first-child').attr('src')
+    get_post_image ($, { selector, attr }) {
+        return $(selector).attr(attr)
     }
 
-    get_post_text ($) {
-        const title = this.get_post_title($);
-        const annotation = $('.l-col-main:first-child .article__text__overview span').text();
-        const description = $('.l-col-main:first-child p').text()
+    get_post_text ($, selectors) {
+        const title = this.get_post_title($, selectors.title);
+        const annotation = $(selectors.annotation).text();
+        const description = $(selectors.description).text()
 
         return [ title, annotation, description ]
             .reduce(
@@ -232,7 +263,7 @@ class vk {
         return images
     }
 
-    async get_rbc_posts_contents (posts) {
+    async get_posts_contents (posts, selectors) {
         const posts_contents = await Promise.all(
             posts.map(
                 async (post) => {
@@ -243,7 +274,7 @@ class vk {
                     const url = link && link.link.url
 
                     if (url) {
-                        const post = await this.get_rbc_post_content(url)
+                        const post = await this.get_post_content(url, selectors)
 
                         return post
                     }
