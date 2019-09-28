@@ -37,9 +37,10 @@ class vk {
         })
     }
 
-    map_post(community, post, content, comment) {
+    map_post(community, post, content, comment, image) {
         return ({
             url: this.get_post_url(community, post.owner_id, post.id),
+            image: image || null,
             owner_id: post.owner_id,
             id: post.id,
             title: content && content.title || post.text,
@@ -56,8 +57,9 @@ class vk {
     async _get_posts (community) {
         const posts = await this.fetch_posts(community)
         const posts_comments = await this.get_posts_comments(posts)
-
-        return this.prepare_posts(community, posts, null, posts_comments)
+        const posts_images = await this.get_posts_images(posts)
+        
+        return this.prepare_posts(community, posts, null, posts_comments, posts_images)
     }
 
     async fetch_posts (community) {
@@ -85,7 +87,6 @@ class vk {
                 await this.get_community_posts(community)),
             ),
         )
-        console.log(communities)
         
         return communities.reduce(
             (communities, community) => [
@@ -111,17 +112,19 @@ class vk {
         const posts = await this.fetch_posts(community)
         const posts_contents = await this.get_rbc_posts_contents(posts)
         const posts_comments = await this.get_posts_comments(posts)
+        const posts_images = await this.get_posts_images(posts)
         
-        return this.prepare_posts(community, posts, posts_contents, posts_comments)
+        return this.prepare_posts(community, posts, posts_contents, posts_comments, posts_images)
     }
 
-    prepare_posts (community, posts, contents, comments) {
+    prepare_posts (community, posts, contents, comments, images) {
         return posts
             .map((post, index) => this.map_post(
                 community,
                 post,
                 contents && contents[index],
                 comments && comments[index],
+                images && images[index],
             ))
     }
 
@@ -186,6 +189,42 @@ class vk {
         return comments
     }
 
+    async get_posts_images (posts) {
+        const images = await Promise.all(
+            posts.map(
+                async (post) => {
+                    const image = (
+                        post.attachments &&
+                        post.attachments.find((attachment) => attachment.type === 'photo')
+                    )
+                    
+                    if (image) {
+                        const photo = await this.vk.api.photos.getById({
+                            photos: [ post.owner_id, image.photo.id, image.photo.access_key ].reduce(
+                                    (paths, path) => [
+                                        ...paths,
+                                        ...path && [ path ],
+                                    ],
+                                    [],
+                                ).join('_'),
+                            extended: 0,
+                        })    
+                    
+                        if (photo[0]) {
+                            const url = photo[0].sizes.find((size) => size.type === 'x').url
+                            
+                            return url
+                        }
+                    }
+
+                    return ''
+                },
+            )
+        )
+
+        return images
+    }
+
     async get_rbc_posts_contents (posts) {
         const posts_contents = await Promise.all(
             posts.map(
@@ -212,6 +251,10 @@ class vk {
 
     get_post_url (community, owner_id, post_id) {
         return `https://vk.com/${community}?w=wall${owner_id}_${post_id}`
+    }
+
+    get_post_image (owner_id, media_id) {
+
     }
 }
 
