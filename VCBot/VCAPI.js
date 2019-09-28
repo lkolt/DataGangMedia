@@ -117,7 +117,7 @@ class OsnovaAPI {
         }
         let attachments = []
         
-        if (image) {
+        if (!!image) {
             const image_data = await this.post_request('uploader/extract', { url: image })
             
             if (image_data.data) {

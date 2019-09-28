@@ -12,12 +12,12 @@ class vk {
         this.posts_count = 5
         this.comments_count = 2
 
-        this.communities = [ 'rbc', 'bizness_online', 'reklamamarketing' ]
+        this.communities = [ 'rbc', 'deep_space', 'space_live' ]
     }
 
     async init() {
         const token = await this.get_token()
-	console.log(token)
+
         return this.vk = new vk_io({ token })
     }
 
@@ -42,7 +42,7 @@ class vk {
     map_post(community, post, content, comment, image) {
         return ({
             url: this.get_post_url(community, post.owner_id, post.id),
-            image: image || null,
+            image: image || content && content.image || null,
             owner_id: post.owner_id,
             id: post.id,
             title: content && content.title || post.text,
@@ -151,11 +151,16 @@ class vk {
         return ({
             title: this.get_post_title($),
             text: this.get_post_text($),
+            image: this.get_post_image($),
         })
     }
 
     get_post_title ($) {
         return $('.l-col-main:first-child .js-slide-title').text()
+    }
+
+    get_post_image ($) {
+        return $('.l-col-main:first-child .article__main-image img:first-child').attr('src')
     }
 
     get_post_text ($) {
