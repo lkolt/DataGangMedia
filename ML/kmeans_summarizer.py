@@ -15,6 +15,7 @@ import os
 import re
 
 
+m = pymorphy2.MorphAnalyzer()
 
 class Summarizer:
 
@@ -48,7 +49,7 @@ class Summarizer:
             sents[i] = word_tokenize(sents[i])
             sents[i] = [word for word in sents[i] if word not in stopwords.words('russian')]
             for j in range(len(sents[i])):
-                sents[i][j] = pymorphy2.MorphAnalyzer().parse(sents[i][j])[0].normal_form
+                sents[i][j] = m.parse(sents[i][j])[0].normal_form
         print('After:', sents)
 
         sent_vectors = []
