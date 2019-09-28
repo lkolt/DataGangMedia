@@ -58,6 +58,6 @@ class Summarizer:
             centre_sents_idx.append(idx_cand[0][int(closest)])
         centre_sents_idx = sorted(centre_sents_idx)
         print(centre_sents_idx)
-        summary = ' '.join([sents_storage[i] for i in centre_sents_idx])
+        summary = '. '.join([sents_storage[i] for i in centre_sents_idx])
         print(summary)
         return summary
