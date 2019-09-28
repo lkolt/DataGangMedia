@@ -10,6 +10,7 @@ class vk {
         this.ready = this.init()
         this.posts_count = 20
         this.comments_count = 10
+        this.communities = [ 'rbc', 'bizness_online', 'reklamamarketing' ]
     }
 
     async init() {
@@ -36,9 +37,9 @@ class vk {
         })
     }
 
-    map_post(post, content, comment) {
+    map_post(community, post, content, comment) {
         return ({
-            url: this.get_post_url(post.owner_id, post.id),
+            url: this.get_post_url(community, post.owner_id, post.id),
             owner_id: post.owner_id,
             id: post.id,
             title: content && content.title || post.text,
@@ -52,18 +53,25 @@ class vk {
         })
     }
 
-    async _get_posts (domain) {
-        const posts = await this.fetch_posts(domain)
+    async _get_posts (community) {
+        const posts = await this.fetch_posts(community)
         const posts_comments = await this.get_posts_comments(posts)
 
-        return this.prepare_posts(posts, null, posts_comments)
+        return this.prepare_posts(community, posts, null, posts_comments)
     }
 
-    async fetch_posts (domain) {
+    async fetch_posts (community) {
         let start = await this.ready
-        const posts = await this.vk.api.wall.get({ domain, count: this.posts_count })
         
-        return posts.items.filter(this.check_ad)
+        try {
+            const posts = await this.vk.api.wall.get({ domain: community, count: this.posts_count })
+            
+            return posts.items.filter(this.check_ad)
+        } catch (err) {
+            console.error(err)
+
+            return []
+        }
     }
 
     async check_ad (post) {
@@ -71,21 +79,44 @@ class vk {
     }
 
     async get_posts () {
-        // 'rbc' only
-        return this.get_rbc_posts()
+        const communities = await Promise.all(
+            this.communities.map(async (community) => (
+                await this.get_community_posts(community)),
+            ),
+        )
+        
+        return communities.reduce(
+            (communities, community) => [
+                ...communities,
+                ...community,
+            ],
+            [],
+        )
     }
 
-    async get_rbc_posts () {
-        const posts = await this.fetch_posts('rbc')
+    async get_community_posts (community) {
+        switch (community) {
+            case 'rbc': {
+                return await this.get_rbc_posts(community)
+            }
+            default: {
+                return await this._get_posts(community)
+            }
+        }
+    }
+
+    async get_rbc_posts (community) {
+        const posts = await this.fetch_posts(community)
         const posts_contents = await this.get_rbc_posts_contents(posts)
         const posts_comments = await this.get_posts_comments(posts)
         
-        return this.prepare_posts(posts, posts_contents, posts_comments)
+        return this.prepare_posts(community, posts, posts_contents, posts_comments)
     }
 
-    prepare_posts (posts, contents, comments) {
+    prepare_posts (community, posts, contents, comments) {
         return posts
             .map((post, index) => this.map_post(
+                community,
                 post,
                 contents && contents[index],
                 comments && comments[index],
@@ -177,8 +208,8 @@ class vk {
         return posts_contents
     }
 
-    get_post_url (owner_id, post_id) {
-        return `https://vk.com/rbc?w=wall${owner_id}_${post_id}`
+    get_post_url (community, owner_id, post_id) {
+        return `https://vk.com/${community}?w=wall${owner_id}_${post_id}`
     }
 }
 
