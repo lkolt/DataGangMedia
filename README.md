@@ -11,6 +11,13 @@ Python > 3.7.2
 ## Build
 
 ### Build ML
+Download model from google drive:
+[model](https://drive.google.com/open?id=1Uyl6JQrH4oekeoJBKUvPCIFvuKX0WIsw)
+
+And move it into ```/models/```:
+
+``` mv run.bin models/```
+
 install requirements:
 
 ``` pip3 install -r ML/requirements.txt```
