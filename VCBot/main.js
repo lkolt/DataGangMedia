@@ -31,7 +31,7 @@ class bot {
         let alredy = await this.get_already_posted
         while (this.idx < posts.length) {
             let post = posts[this.idx++]
-            post['md5'] = md5(post['text'])
+            post['md5'] = md5(post['title'])
             this.idx++
             if (!alredy.includes(post['md5'])){
                 return [post]
