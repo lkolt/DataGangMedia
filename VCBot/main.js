@@ -64,6 +64,9 @@ class bot {
             let formatted_posts = await this.wrapper.proccess(new_posts)
             console.log('Formatted posts:', formatted_posts.length)
             for (let post of formatted_posts) {
+                if (post.text[post.text.length - 1] != '.') {
+                    post.text += '.'
+                }
                 if (post.class != 'Оффтоп') {
                     if (!this.dijest[post.class]) {
                         this.dijest[post.class] = []
