@@ -12,7 +12,7 @@ class vk {
         this.posts_count = 5
         this.comments_count = 2
 
-        this.communities = [ 'rbc', 'bizness_online', 'reklamamarketing' ]
+        this.communities = [ 'rbc', 'deep_space', 'space_live' ]
     }
 
     async init() {
