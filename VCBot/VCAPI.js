@@ -100,7 +100,7 @@ class OsnovaAPI {
                     this.attempts++
                     console.log('Try to reget login')
                     this.token = this.get_token()
-                    return this.get_request(path, args)
+                    return this.post_request(path, args)
                 } else {
                     return reject({ err: error.code })
                 }
