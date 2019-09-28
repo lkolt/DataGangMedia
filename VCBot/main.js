@@ -17,11 +17,6 @@ class bot {
         let posts = await this.sources.get_posts()
         let formatted_posts = await this.wrapper.proccess(posts)
         console.log('Formatted posts:', formatted_posts)
-        const vk_posts = await this.sources.get_vk_posts();
-        console.log('vk_posts', vk_posts)
-        return
-        let posts = this.sources.get_posts()
-        let formatted_posts = this.wrapper.proccess(posts)
         for (let post of formatted_posts) {
             let res = this.api.create_entry(post.title, post.text)
             if (res.err) {
