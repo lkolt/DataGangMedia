@@ -16,7 +16,7 @@ class bot {
         this.idx = 0
         this.get_posts()
         this.get_already_posted = this.get_already_posted()
-        setInterval(this.run.bind(this), 1000 * 60)
+        setInterval(this.run.bind(this), 1000 * 60 * 3)
     }
 
     async get_posts () {
@@ -59,9 +59,9 @@ class bot {
                 let res = this.api.create_entry(post.title, post.text)
                 if (res.err) {
                     console.log('Cant create post!:', res.err)
-                    new_post(post['md5'])
                 } else {
                     console.log('Post', post, 'created')
+                    this.new_post(post['md5'])
                 }
             }
         }
