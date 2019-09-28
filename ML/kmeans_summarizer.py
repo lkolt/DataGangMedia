@@ -1,15 +1,27 @@
 import numpy as np
+from copy import deepcopy
+
 from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin_min
+
 from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
-from copy import deepcopy
+
 import gensim
 import pymorphy2
+import pickle
+import json
+import os
 import re
 
 
+
 class Summarizer:
+
+    def __init__(self):
+        print('Loading model...')
+        self.pretrained_ft = gensim.models.fasttext.load_facebook_model('models/ru.bin', encoding='utf-8')
+        print('Model loaded!')
 
     def preprocessing_rus(self, sentence):
         sentence = sentence.lower()
@@ -20,11 +32,6 @@ class Summarizer:
         return np.array([np.mean([self.pretrained_ft[w] for w in sentence_tokens
                                                     if w in self.pretrained_ft]
                                  or [np.zeros(300)], axis=0)])
-
-    def __init__(self):
-        print('Loading model...')
-        self.pretrained_ft = gensim.models.fasttext.load_facebook_model('models/ru.bin', encoding='utf-8')
-        print('Model loaded!')
 
     def get_summary(self, text: str):
         print('init model:', text)
@@ -62,3 +69,23 @@ class Summarizer:
         summary = '. '.join([sents_storage[i] for i in centre_sents_idx])
         print(summary)
         return summary
+
+
+class Classifier:
+
+    def __init__(self):
+        print('Loading pipeline...')
+        self.clf_pipe = pickle.load(open('models/classification_pipeline.pkl', 'rb'))
+        print('Pipeline loaded!')
+
+    def preprocessing_rus(self, text):
+        text = text.lower()
+        text = re.sub('[^А-Яа-яA-Za-z]+', ' ', text).strip()
+        text = word_tokenize(text)
+        text = [m.parse(w)[0].normal_form for w in text if w not in stopwords.words('russian')]
+        return ' '.join(text)
+
+    def get_class(self, text):
+        text = self.preprocessing_rus(text)
+        return self.clf_pipe.predict([text])[0]
+
