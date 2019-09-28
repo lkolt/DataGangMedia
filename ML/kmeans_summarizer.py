@@ -29,7 +29,8 @@ class Summarizer:
     def get_summary(self, text: str):
         print('init model:', text)
 
-        sents = sent_tokenize(text)
+        sents = [sent.split('.') for sent in sent_tokenize(text)]
+        sents = [item for sublist in sents for item in sublist if len(item)]
         sents_storage = deepcopy(sents)
         n_sents = int(round(np.sqrt(len(sents_storage))))
 
