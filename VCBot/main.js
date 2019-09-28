@@ -89,25 +89,28 @@ class bot {
                             console.log('Dijest', 'created')
                         }
                         this.dijest[post.class] = []
+                    } else {
+                        let res = this.api.create_entry(
+                            post.title,
+                            (
+                                post.text +
+                                (post.url
+                                    ? `\nСоздано автоматически на основе: <a href="${post.url}" target="_blank">${post.url}</a>`
+                                    : '')
+                            ),
+                            post.image,
+                        )
+                        if (res.err) {
+                            console.log('Cant create post!:', res.err)
+                        } else {
+                            console.log('Post', post, 'created')
+                            this.new_post(post['md5'])
+                            this.new_hashes.push(post['md5'])
+                        }
                     }
-                }
-
-                let res = this.api.create_entry(
-                    post.title,
-                    (
-                        post.text +
-                        (post.url
-                            ? `\nСоздано автоматически на основе: <a href="${post.url}" target="_blank">${post.url}</a>`
-                            : '')
-                    ),
-                    post.image,
-                )
-                if (res.err) {
-                    console.log('Cant create post!:', res.err)
+                    console.log(this.dijest)
                 } else {
-                    console.log('Post', post, 'created')
-                    this.new_post(post['md5'])
-                    this.new_hashes.push(post['md5'])
+                    console.log('This post is offtop!!')
                 }
             }
         }
