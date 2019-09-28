@@ -35,7 +35,7 @@ class wrapper {
         let ready = await this.ready
         if (ready) {
             let start_id = this.id
-            for (let post of posts) {
+            for await (let post of posts) {
                 this.posts[this.id] = post
                 let msg = {
                     id: this.id,

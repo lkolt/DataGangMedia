@@ -8,12 +8,13 @@ class vk {
     }
 
     async init() {
-        this.vk = new vk_io({ token: await this.get_token() })
+        let token = await this.get_token()
+        this.vk = new vk_io({ token: token })
     }
 
     async get_token () {
         return new Promise((resolve, reject) => {
-            fs.readFile('vk.config', 'utf8', (err, data) => {
+            fs.readFile('apis/vk.config', 'utf8', (err, data) => {
                 resolve(data)
             })
         })
@@ -48,10 +49,10 @@ class vk {
         })
     }
 
-    async get_posts () {
+    async _get_posts (domain) {
         // fetch posts
         let start = await this.ready
-        const posts = await this.vk.api.wall.get({ domain: 'rbc', count: 10 });
+        const posts = await this.vk.api.wall.get({ domain: domain, count: 10 });
         // fetch comments
         const comments = await Promise.all(
             posts.items.map(
@@ -75,6 +76,11 @@ class vk {
             .map((post) => this.mapPost(post, comments))
         
         return result
+    }
+
+    async get_posts () {
+        // 'ria', 'rbk'
+        return this._get_posts('probizportal')
     }
 }
 

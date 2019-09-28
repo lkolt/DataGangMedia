@@ -1,4 +1,6 @@
 'use strict'
+const md5 = require('md5')
+const fs = require('fs')
 
 const VCAPI = require('./VCAPI')
 const sources = require('./sources')
@@ -11,18 +13,56 @@ class bot {
         this.api = VCAPI.get(url_vc)
         this.sources = sources.get()
         this.wrapper = ml_wrapper.get()
+        this.idx = 0
+        this.get_posts()
+        this.get_already_posted = this.get_already_posted()
+        setInterval(this.run.bind(this), 1000 * 60)
+    }
+
+    async get_posts () {
+        this.posts = this.sources.get_posts()
+    }
+    
+    async get_post () {
+        let posts = await this.posts
+        let alredy = await this.get_already_posted
+        while (this.idx < posts.length) {
+            let post = posts[this.idx++]
+            post['md5'] = md5(post['text'])
+            this.idx++
+            if (!alredy.includes(post['md5'])){
+                return [post]
+            }
+        }
+        
+        return []
+    }
+
+    async get_already_posted () {
+        return new Promise((resolve, reject) => {
+            fs.readFile('posted.db', 'utf8', (err, data) => {
+                resolve(data.split('\n'))
+            })
+        })
+    }
+
+    new_post (md5) {
+        fs.appendFile('posted.db', md5, () => {})
     }
 
     async run () {
-        let posts = await this.sources.get_posts()
-        let formatted_posts = await this.wrapper.proccess(posts)
-        console.log('Formatted posts:', formatted_posts)
-        for (let post of formatted_posts) {
-            let res = this.api.create_entry(post.title, post.text)
-            if (res.err) {
-                console.log('Cant create post!:', res.err)
-            } else {
-                console.log('Post', post, 'created')
+        let new_posts = await this.get_post()
+        if (new_posts.length) {
+            let formatted_posts = await this.wrapper.proccess(new_posts)
+            console.log('Formatted posts:', formatted_posts)
+            for (let post of formatted_posts) {
+                let res = this.api.create_entry(post.title, post.text)
+                if (res.err) {
+                    console.log('Cant create post!:', res.err)
+                    new_post(post['md5'])
+                } else {
+                    console.log('Post', post, 'created')
+                }
             }
         }
     }
