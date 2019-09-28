@@ -1,11 +1,22 @@
 'use strict'
-
+const fs = require('fs')
 const { VK: vk_io } = require('vk-io')
 
 class vk {
     constructor() {
-        // TODO: put in config
-        this.vk = new vk_io({ token: 'fec36708fec36708fec3670824feae7a1effec3fec36708a34de6902b22244902f2d16b' });
+        this.ready = this.init()
+    }
+
+    async init() {
+        this.vk = new vk_io({ token: await this.get_token() })
+    }
+
+    async get_token () {
+        return new Promise((resolve, reject) => {
+            fs.readFile('vk.config', 'utf8', (err, data) => {
+                resolve(data)
+            })
+        })
     }
     
     mapComment(comment) {
@@ -39,6 +50,7 @@ class vk {
 
     async get_posts () {
         // fetch posts
+        let start = await this.ready
         const posts = await this.vk.api.wall.get({ domain: 'rbc', count: 10 });
         // fetch comments
         const comments = await Promise.all(
