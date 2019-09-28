@@ -187,23 +187,23 @@ class vk {
     }
 
     get_post_title ($, title) {
-        return $(title).text()
+        return title && $(title).text()
     }
 
-    get_post_image ($, { selector, attr }) {
-        return $(selector).attr(attr)
+    get_post_image ($, image) {
+        return image.selector && image.attr && $(image.selector).attr(image.attr)
     }
 
     get_post_text ($, selectors) {
-        const title = this.get_post_title($, selectors.title);
-        const annotation = $(selectors.annotation).text();
-        const description = $(selectors.description).text()
+        const title = selectors.title && this.get_post_title($, selectors.title)
+        const annotation = selectors.annotation && $(selectors.annotation).text()
+        const description = selectors.description && $(selectors.description).text()
 
         return [ title, annotation, description ]
             .reduce(
                 (texts, text) => [
                     ...texts,
-                    ...text && [ text ],
+                    ...!!text ? [ text ] : [],
                 ],
                 [],
             )
@@ -241,7 +241,7 @@ class vk {
                             photos: [ post.owner_id, image.photo.id, image.photo.access_key ].reduce(
                                     (paths, path) => [
                                         ...paths,
-                                        ...path && [ path ],
+                                        ...!!path ? [ path ] : [],
                                     ],
                                     [],
                                 ).join('_'),
