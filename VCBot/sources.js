@@ -42,7 +42,7 @@ class sources {
         console.log('Get approved posts:', approved_posts.length)
         approved_posts = approved_posts.map((item) => { 
             if (item.title === item.text) {
-                item.title = item.text.split('.')[0].split(' ').slice(0, 6) + '...'
+                item.title = item.text.split('.')[0].split('\n')[0].split(' ').slice(0, 6).join(' ')
             }
             return item
         })
