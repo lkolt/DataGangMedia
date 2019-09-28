@@ -8,14 +8,16 @@ const axios = require('axios')
 class vk {
     constructor() {
         this.ready = this.init()
-        this.posts_count = 3
+
+        this.posts_count = 5
         this.comments_count = 2
+
         this.communities = [ 'rbc', 'bizness_online', 'reklamamarketing' ]
     }
 
     async init() {
         const token = await this.get_token()
-
+	console.log(token)
         return this.vk = new vk_io({ token })
     }
 

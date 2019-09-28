@@ -16,7 +16,7 @@ class bot {
         this.idx = 0
         this.get_already_posted = this.get_already_posted()
         this.get_posts()
-        setInterval(this.get_posts.bind(this), 1000 * 60 * 60)
+        setInterval(this.get_posts.bind(this), 1000 * 60 * 30)
         setInterval(this.run.bind(this), 1000 * 60 * 10)
     }
 
