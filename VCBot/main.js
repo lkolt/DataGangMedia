@@ -13,6 +13,7 @@ class bot {
         this.api = VCAPI.get(url_vc)
         this.sources = sources.get()
         this.wrapper = ml_wrapper.get()
+        this.new_hashes = []
         this.idx = 0
         this.get_posted = this.get_already_posted()
         this.get_posts()
@@ -29,11 +30,12 @@ class bot {
     async get_post () {
         let posts = await this.posts
         let already = await this.get_posted
+        // console.log(already)
         while (this.idx < posts.length) {
             let post = posts[this.idx++]
             post['md5'] = md5(post['title'])
             this.idx++
-            if (!already.includes(post['md5'])){
+            if (!already.includes(post['md5']) && !this.new_hashes.includes(post['md5'])){
                 return [post]
             }
         }
@@ -77,7 +79,7 @@ class bot {
                 } else {
                     console.log('Post', post, 'created')
                     this.new_post(post['md5'])
-                    this.get_posted.push(post['md5'])
+                    this.new_hashes.push(post['md5'])
                 }
             }
         }
