@@ -117,13 +117,13 @@ class OsnovaAPI {
         }
         let attachments = []
 
-        if (url) {
+        /*if (url) {
             const url_data = await this.post_request('uploader/extract', url)
             
             if (url_data.data) {
                 attachments = [ ...attachments, ...url_data.data.result ]
             }  
-        }
+        }*/
 
         return this.post_request('entry/create', { ...form, attachments: JSON.stringify(attachments) })
     }
