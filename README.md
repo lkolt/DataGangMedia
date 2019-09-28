@@ -26,11 +26,7 @@ install requirements:
 
 Download nltk data:
 
-``` python3 ```
-
-``` import nltk ```
-
-``` nltk.download() ```
+``` python3 -m nltk.downloader all ```
 
 And download all packages!
 
@@ -42,9 +38,9 @@ And download all packages!
 Add VC token to ```token``` file and VK token to ```apis/vk.config``` filee
 
 ## Run
-Run ML: ``` python3 ML/server.py```
+Run ML: ``` python3 ML/server.py```. And waiting label ```Model loaded!```
 
-Run bot: 
+Now you can run bot: 
 
 ``` cd VCBot```
 
