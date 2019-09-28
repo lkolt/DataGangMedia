@@ -37,6 +37,8 @@ And download all packages!
 
 ```npm install```
 
+Add VC token to ```token``` file and VK token to ```apis/vk.config``` filee
+
 ## Run
 Run ML: ``` python3 ML/server.py```
 
