@@ -90,7 +90,7 @@ class OsnovaAPI {
                 this.attempts = 0
                 return resolve({
                     err: null,
-                    data: response
+                    data: response.data
                 })
             })
             .catch((error) => {
