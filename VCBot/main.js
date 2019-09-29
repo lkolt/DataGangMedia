@@ -140,7 +140,7 @@ class bot {
                             this.new_hashes.push(post['md5'])
                             if (need_comment()) {
                                 console.log('Posting comment...')
-                                comment = take_comment(post.class)
+                                let comment = take_comment(post.class)
                                 console.log('Comment:', comment)
                                 this.api.create_comment(res.data.result.id, comment, 0, [])
                             }
