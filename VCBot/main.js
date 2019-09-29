@@ -85,7 +85,7 @@ class bot {
                             text += idx + ') ' + item.text + '\n'
                             text += `Полная статья: <a href="${item.url}" target="_blank">${item.url}</a>\n\n`
                         }
-                        let res = this.api.create_entry(title, text)
+                        let res = this.api.create_entry(title, text, [])
                         
                         if (res.err) {
                             console.log('Cant create post!:', res.err)
