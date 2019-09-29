@@ -66,7 +66,7 @@ class sources {
             }
             return item
         })
-        console.log(approved_posts)
+        // console.log(approved_posts)
         
         return approved_posts
     }

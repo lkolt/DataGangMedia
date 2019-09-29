@@ -60,6 +60,7 @@ class bot {
     async run () {
         console.log('Try to post entry')
         let new_posts = await this.get_post()
+        console.log('New post:', new_posts)
         if (new_posts.length) {
             let formatted_posts = await this.wrapper.proccess(new_posts)
             console.log('Formatted posts:', formatted_posts.length)
