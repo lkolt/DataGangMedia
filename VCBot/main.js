@@ -68,7 +68,7 @@ class bot {
                 if (post.text[post.text.length - 1] != '.') {
                     post.text += '.'
                 }
-                if (post.class != 'Оффтоп') {
+                if (post.class != 'Офтоп') {
                     if (!this.dijest[post.class]) {
                         this.dijest[post.class] = []
                     }
