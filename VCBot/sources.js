@@ -52,7 +52,7 @@ class sources {
         let approved_posts = vk_posts.filter((item) => { 
             let preproc = item.text.replace(' ', '').toLocaleLowerCase()
             return  preproc.length  > 500 && 
-                    !check_stop_words(preproc) &&
+                    // !check_stop_words(preproc) &&
                     !regex.exec(preproc)
         })
         console.log('Get approved posts:', approved_posts.length)
