@@ -9,6 +9,32 @@ const ml_wrapper = require('./ml_wrapper')
 const url_vc = 'https://api.vc.ru/v1.8/'
 const min_posts_for_dijest = 3
 
+const all_comments = ['Осуждаю', 'Ну это уже слишком!', 'Что тут еще сказать...', 'Как это вообще сюда попало?!']
+const tematic_comments = {
+    'Техника': ['Ммм.. У нас на матмехе такого не рассказывали', 'Что-то сложно, кто расскажет легче?'],
+    'Право': ['Опять политика...', 'Это тот VC.ru, что я люблю!'],
+    'Маркетинг': ['Я не буду ничего у вас покупать!'],
+    'Финансы': ['Уже пора вкладываться в биткоин??', 'Продам гараж!']
+}
+
+let need_comment = () => {
+    let rand = Math.random()
+    console.log('Rand:', rand)
+    return rand > 0.75
+}
+
+let take_comment = function (cat) {
+    if (!tematic_comments[cat]) {
+        return get_random_comment(all_comments)
+    }
+    return get_random_comment(Math.random < 0.75 ? all_comments : tematic_comments[cat])
+}
+
+let get_random_comment = (comments) => {
+    let idx = Math.floor(Math.random() * comments.length)
+    return comments[idx]
+}
+
 class bot {
     constructor () {
         this.api = VCAPI.get(url_vc)
@@ -85,16 +111,18 @@ class bot {
                             text += idx + ') ' + item.text + '\n'
                             text += `Полная статья: <a href="${item.url}" target="_blank">${item.url}</a>\n\n`
                         }
-                        let res = this.api.create_entry(title, text, [])
+                        let res = await this.api.create_entry(title, text, [])
                         
                         if (res.err) {
                             console.log('Cant create post!:', res.err)
                         } else {
                             console.log('Dijest', 'created')
+                            this.api.create_comment(res.data.result.id, 'Вам нравятся посты по тематике ' + 
+                                post.class.toLocaleLowerCase() + '? Ставьте ваши плюсы!', 0, [])
                         }
                         this.dijest[post.class] = []
                     } else {
-                        let res = this.api.create_entry(
+                        let res = await this.api.create_entry(
                             post.title,
                             (
                                 post.text +
@@ -110,12 +138,19 @@ class bot {
                             console.log('Post', post, 'created')
                             this.new_post(post['md5'])
                             this.new_hashes.push(post['md5'])
-                            console.log(res.data)
+                            if (need_comment()) {
+                                console.log('Posting comment...')
+                                comment = take_comment(post.class)
+                                console.log('Comment:', comment)
+                                this.api.create_comment(res.data.result.id, comment, 0, [])
+                            }
                         }
                     }
                     console.log(this.dijest)
                 } else {
                     console.log('This post is offtop!!')
+                    this.new_post(post['md5'])
+                    this.new_hashes.push(post['md5'])
                 }
             }
         }
