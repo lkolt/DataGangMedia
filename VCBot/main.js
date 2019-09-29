@@ -110,6 +110,7 @@ class bot {
                             console.log('Post', post, 'created')
                             this.new_post(post['md5'])
                             this.new_hashes.push(post['md5'])
+                            console.log(res.data)
                         }
                     }
                     console.log(this.dijest)
