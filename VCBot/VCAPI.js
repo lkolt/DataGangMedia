@@ -90,11 +90,11 @@ class OsnovaAPI {
                 this.attempts = 0
                 return resolve({
                     err: null,
-                    data: response.data
+                    data: response
                 })
             })
             .catch((error) => {
-                console.log('Cant get path:', path, 'Recieve: ', JSON.stringify(error))
+                console.log('Cant post path:', path, 'Recieve: ', JSON.stringify(error))
                 console.log('Attempts:', this.attempts)
                 if (this.attempts < max_attempts) {
                     this.attempts++
@@ -102,7 +102,7 @@ class OsnovaAPI {
                     this.token = this.get_token()
                     return this.post_request(path, args)
                 } else {
-                    return reject({ err: error.code })
+                    return resolve({ err: error.code })
                 }
             })
         })
