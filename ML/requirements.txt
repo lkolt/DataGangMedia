@@ -1,4 +1,4 @@
-numpy == 1.17.2
+numpy == 1.22.0
 sklearn
 nltk == 3.4.5
 gensim == 3.8.1
