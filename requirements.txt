@@ -1,6 +1,6 @@
 numpy == 1.17.2
 sklearn == 0.21.3
-nltk == 3.4.5
+nltk == 3.6.6
 gensim == 3.8.1
 pymorphy2 == 0.8
 re == 2.2.1
